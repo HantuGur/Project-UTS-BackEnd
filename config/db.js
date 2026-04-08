@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 
-const connectDB = async () => {
+const connectDB = async () => {mongodb+srv://oliviancerlindo:olivian00@cluster0.fhqw8dn.mongodb.net/?appName=Cluster0
   try {
     const conn = await mongoose.connect(process.env.MONGODB_URI);
     console.log(`✅ MongoDB Connected: ${conn.connection.host}`);
