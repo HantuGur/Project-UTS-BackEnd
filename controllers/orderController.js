@@ -60,4 +60,55 @@ const createOrder = async (req, res) => {
     res.status(400).json({ success: false, message: error.message });
   }
 };
+const getOrderById = async (req, res) => {
+  try {
+    const order = await Order.findById(req.params.id)
+      .populate('customer', 'name phone email')
+      .populate('table', 'table_number location')
+      .populate('items.menu', 'name price');
+
+    if (!order) {
+      return res.status(404).json({ success: false, message: 'Order tidak ditemukan' });
+    }
+    res.status(200).json({ success: true, data: order });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+
+const updateOrderStatus = async (req, res) => {
+  try {
+    const { status } = req.body;
+    const validStatus = ['pending', 'processing', 'served', 'paid', 'cancelled'];
+
+    if (!validStatus.includes(status)) {
+      return res.status(400).json({
+        success: false,
+        message: `Status tidak valid. Pilih dari: ${validStatus.join(', ')}`,
+      });
+    }
+
+    const order = await Order.findByIdAndUpdate(
+      req.params.id,
+      { status },
+      { new: true }
+    ).populate('customer', 'name');
+
+    if (!order) {
+      return res.status(404).json({ success: false, message: 'Order tidak ditemukan' });
+    }
+
+    res.status(200).json({
+      success: true,
+      message: `Status order berhasil diubah menjadi "${status}"`,
+      data: order,
+    });
+  } catch (error) {
+    res.status(400).json({ success: false, message: error.message });
+  }
+};
+
+module.exports = { getAllOrders, createOrder, getOrderById, updateOrderStatus };
+
 
